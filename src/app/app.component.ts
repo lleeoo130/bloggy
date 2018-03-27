@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import * as firebase from 'firebase';
+
+
+
 
 @Component({
   selector: 'app-root',
@@ -8,25 +12,16 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'app';
 
+  constructor() {
+    var config = {
+      apiKey: "AIzaSyDkz3HZKGjE1MvQqKcXlpodwUrZCY7BhQI",
+      authDomain: "bloggy-5e523.firebaseapp.com",
+      databaseURL: "https://bloggy-5e523.firebaseio.com",
+      projectId: "bloggy-5e523",
+      storageBucket: "",
+      messagingSenderId: "491676106333"
+    };
+    firebase.initializeApp(config);
+  }
   
-  posts = [
-    {
-      title : 'Premier Post: Bonjour à toi!',
-      content: 'Lorem Ipsum Frerot',
-      loveIts: 0,
-      created_at: new Date()
-    },
-    {
-      title : 'Deuxième Post: Bonjour à toie!',
-      content: 'Lorem Ipsum Soeur',
-      loveIts: 0,
-      created_at: new Date()
-    },
-    {
-      title : 'Troisème Post: Bonjour à tous!',
-      content: 'Lorem Ipsum tous!',
-      loveIts: 0,
-      created_at: new Date()
-    }
-  ]
 }

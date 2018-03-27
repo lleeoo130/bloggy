@@ -1,22 +1,29 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Post } from '../models/post.model';
+import { PostServiceService } from '../post-service.service';
+import { Subscription } from 'rxjs/Subscription';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-post-list-item',
   template: `
-  <div [ngClass]="{    'list-group-item-success': postIsLoved === true,
-                       'list-group-item-danger': postIsLoved === false    }" >
-    <h2 class="title">
-      {{ postTitle }}
-    </h2>
-    <span class="date"> {{ postCreatedAt | date:'short' }} </span>
-    <p>
-      {{ postContent }}
-    </p>
-    <span class="loveItsCounter"> Nombre de LoveIts: {{ postLoveIts }} </span>
-    <br>
-    <button class="btn btn-success"  (click)="increaseLoveIts()"  >Love It! :)</button>
-    <button class="btn btn-danger"   (click)="decreaseLoveIts()" >Don't Love It! :(</button>
-  </div>
+      <div class="row justify-content-md-center ">
+        <div *ngFor="let post of posts; let i = index" class="list-group-item-{{ post.loved }}"   class="col-sm-12">
+          
+              <h2 class="title"> {{ post.title }}</h2>
+
+              <span class="date"> {{ post.created_at | date:'short' }} </span>
+
+              <p> {{ post.content }} </p>
+
+              <span class="loveItsCounter"> Nombre de LoveIts: {{ post.loveIts }} </span><br>
+              
+              <button class="btn btn-success"  (click)="increaseLoveIts(i)"  >Love It! :)</button>
+              <button class="btn btn-danger"   (click)="decreaseLoveIts(i)" >Don't Love It! :(</button>
+              <button class="btn btn-warning float-right"   (click)="onRemove(post)" >Remove Post</button>
+              
+        </div>
+      </div>
   `,
   styles: [
     `div{
@@ -32,39 +39,65 @@ import { Component, OnInit, Input } from '@angular/core';
       display: inline-block;
       float: right;
     }
+    .list-group-item-danger,.list-group-item-warning,.list-group-item-success {
+      border: 1px solid black;
+    }
   `]
 })
-export class PostListItemComponent implements OnInit {
+export class PostListItemComponent implements OnInit, OnDestroy {
 
-  @Input() postTitle: string;
-  @Input() postContent: string;
-  @Input() postLoveIts: number;
-  @Input() postCreatedAt: Date;
+  posts: Post[];
+  postSubscription: Subscription;
 
-  postIsLoved : boolean;
 
-  constructor() { }
+  constructor(private postservice : PostServiceService,
+              private router: Router) { }
 
   ngOnInit() {
+    this.postSubscription = this.postservice.postSubject.subscribe(
+      (posts: Post[]) => {
+        this.posts = posts;
+      }
+    );
+    this.postservice.getPosts();
+    this.postservice.emitPosts();
   }
 
-  checkLoveIts(){
-    if(this.postLoveIts>0){
-      this.postIsLoved = true;
+  ngOnDestroy(){
+    this.postSubscription.unsubscribe();
+  }
+
+  increaseLoveIts(index){
+    this.postservice.posts[index].loveIts++;
+    this.postIsNotLoved(index);
+    this.postservice.savePosts();
+
+    this.postservice.emitPosts();
+    
+  }
+
+  decreaseLoveIts(index){
+    this.postservice.posts[index].loveIts--;
+    this.postIsNotLoved(index);
+    this.postservice.savePosts();
+    this.postservice.emitPosts();
+  }
+
+  postIsNotLoved(index){
+    if(this.postservice.posts[index].loveIts>0){
+      this.postservice.posts[index].loved = 'success';
+    }
+    else if(this.postservice.posts[index].loveIts == 0){
+      this.postservice.posts[index].loved = 'warning';
+
     }
     else{
-      this.postIsLoved = false;
+      this.postservice.posts[index].loved = 'danger';
     }
   }
 
-  increaseLoveIts(){
-    this.postLoveIts = this.postLoveIts +1;
-    this.checkLoveIts();
-  }
-
-  decreaseLoveIts(){
-    this.postLoveIts = this.postLoveIts -1;
-    this.checkLoveIts();
+  onRemove(post: Post){
+    this.postservice.removePost(post);  
   }
 
 

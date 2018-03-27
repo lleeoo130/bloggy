@@ -1,9 +1,18 @@
-<h1> Bienvenue sur Bloggy !!!</h1>
-<ul class="list-group">
-    <app-post-list *ngFor="let post of posts" [postTitle]="post.title"
-                                            [postContent]="post.content"
-                                            [postLoveIts]="post.loveIts"
-                                            [postCreatedAt]="post.created_at">
-    </app-post-list>
-</ul>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Blog</a>
+        
+      
+        <div class="collapse navbar-collapse" >
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item" routerLinkActive="active">
+              <a class="nav-link" routerLink="posts">Posts</a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+              <a class="nav-link" routerLink="new">Nouveau Post</a>
+            </li>          
+          </ul>          
+        </div>
+      </nav>
 
+
+    <router-outlet></router-outlet>
