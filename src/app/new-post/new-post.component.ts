@@ -36,11 +36,12 @@ export class NewPostComponent implements OnInit {
   onSubmitForm() {
     const formValue = this.postForm.value;
     const newPost = new Post(
-      formValue['title']
+      formValue['title'],
+      this.postForm.value['content'],
+      0,
+      new Date()
     );
-    newPost.content = this.postForm.value['content'];
-    newPost.loveIts = 0;
-    newPost.created_at = new Date;
+    console.log(newPost);
     this.postService.addPost(newPost);
     this.router.navigate(['/posts']);
   }

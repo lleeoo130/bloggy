@@ -19,6 +19,7 @@ export class PostServiceService {
   }
 
   addPost(newPost: Post) {
+    newPost.created_at = firebase.database.ServerValue.TIMESTAMP;
     this.posts.push(newPost);
     this.savePosts();
     this.emitPosts();
